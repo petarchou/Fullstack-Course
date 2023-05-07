@@ -11,8 +11,22 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
     'The only way to go fast, is to go well.'
   ]
-   
+  const initialVotes = () => {
+    const res = {};
+    for (const key in anecdotes) {
+      res[key] = 0;
+    }
+
+    return res;
+  }
+
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(initialVotes())
+  
+  const voteForAnecdote = () => setVotes({
+    ...votes,
+    [selected]: votes[selected] + 1,
+  })
 
   const randomAnecdote = () => {
     let number = selected;
@@ -21,14 +35,26 @@ const App = () => {
     }
     setSelected(number);
   }
-  console.log(selected);
+
   return (
     <div>
       {anecdotes[selected]}
-      <br/>
-      <button onClick={randomAnecdote}>Get next anecdote</button>
+      <div>
+        has {votes[selected]} votes
+      </div>
+      <div>
+        <Button text="vote" handleClick={voteForAnecdote} />
+        <Button text="next anecdote" handleClick={randomAnecdote} />
+      </div>
     </div>
   )
 }
+
+
+const Button = ({text, handleClick}) => (
+  <button onClick={handleClick}>
+    {text}
+  </button>
+)
 
 export default App
