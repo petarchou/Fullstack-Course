@@ -91,18 +91,8 @@ const Statistics = ({votes}) => {
 }
 
 const StatsAggregate = ({votes}) => {
-  let totalVotes = 0, positivityScore = 0, positiveVotes = 0;
   
-  votes.forEach(vote => {
-    if(vote.type.localeCompare('Good') === 0) {
-      positiveVotes+= vote.amount;
-      positivityScore += vote.amount;
-    }
-    else if(vote.type.localeCompare('Bad') === 0) {
-      positivityScore -= vote.amount;
-    }
-    totalVotes += vote.amount;
-  });
+  const {totalVotes, positivityScore, positiveVotes} = calculateVotes(votes);
 
   const average = positivityScore/totalVotes || 0;
   const positivePercent = (positiveVotes/totalVotes * 100) || 0;
@@ -122,6 +112,24 @@ const VoteAmounts = ({type, amount}) => (
   </div>
 )
 
+const calculateVotes = (votes) => {
+  let totalVotes = 0, positivityScore = 0, positiveVotes = 0;
+  votes.forEach(vote => {
+    if(vote.type.localeCompare('Good') === 0) {
+      positiveVotes+= vote.amount;
+      positivityScore += vote.amount;
+    }
+    else if(vote.type.localeCompare('Bad') === 0) {
+      positivityScore -= vote.amount;
+    }
+    totalVotes += vote.amount;
+  });
 
+  return {
+    totalVotes,
+    positiveVotes,
+    positivityScore
+  }
+}
 
 export default App
