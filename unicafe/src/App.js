@@ -77,6 +77,8 @@ const Statistics = ({votes}) => {
   return (
     <div>
       <h1>Statistics</h1>
+      <table>
+      <tbody>
       {
         votes.map(vote => {
           return (
@@ -85,6 +87,8 @@ const Statistics = ({votes}) => {
         })
       }
       <StatsAggregate votes={votes}/>
+      </tbody>
+      </table>
     </div>
   )
 
@@ -99,9 +103,9 @@ const StatsAggregate = ({votes}) => {
 
   if(totalVotes === 0) {
     return (
-      <div>
-        No feedback given
-      </div>
+      <tr>
+        <td>No feedback given</td>
+      </tr>
     )
   }
 
@@ -114,9 +118,10 @@ const StatsAggregate = ({votes}) => {
 }
 
 const StatisticLine = ({type, value}) => (
-  <div>
-    {type} {value}
-  </div>
+  <tr>
+    <td>{type}</td>
+    <td>{value}</td>
+  </tr>
 )
 
 const calculateVotes = (votes) => {
