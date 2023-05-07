@@ -38,18 +38,39 @@ const App = () => {
 
   return (
     <div>
+      <h1>Anecdote of the click</h1>
       {anecdotes[selected]}
+
       <div>
         has {votes[selected]} votes
       </div>
-      <div>
+      <div  style={{marginTop: 10+"px"}}>
         <Button text="vote" handleClick={voteForAnecdote} />
         <Button text="next anecdote" handleClick={randomAnecdote} />
       </div>
+      <MostWinsAnecdote anecdotes={anecdotes} votes={votes}/>
     </div>
   )
 }
 
+const MostWinsAnecdote = ({anecdotes, votes}) => {
+  let mostVotesIndex = 0;
+
+  for (const key in votes) {
+    if(votes[mostVotesIndex] < votes[key]){
+      mostVotesIndex = key;
+    }
+  }
+
+  return (
+    <div style={{marginTop: 10+"px"}}>
+      <h1>Anecdote with most votes</h1>
+      <p>
+       {anecdotes[mostVotesIndex]} 
+      </p>
+    </div>
+  )
+}
 
 const Button = ({text, handleClick}) => (
   <button onClick={handleClick}>
