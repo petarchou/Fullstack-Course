@@ -80,7 +80,7 @@ const Statistics = ({votes}) => {
       {
         votes.map(vote => {
           return (
-            <VoteAmounts key={vote.type} type={vote.type} amount={vote.amount}/>
+            <StatisticLine key={vote.type} type={vote.type} value={vote.amount}/>
           )
         })
       }
@@ -97,7 +97,7 @@ const StatsAggregate = ({votes}) => {
   const average = positivityScore/totalVotes || 0;
   const positivePercent = (positiveVotes/totalVotes * 100) || 0;
 
-  if(totalVotes == 0) {
+  if(totalVotes === 0) {
     return (
       <div>
         No feedback given
@@ -106,17 +106,16 @@ const StatsAggregate = ({votes}) => {
   }
 
   return (
-    <div>
-      average {average}
-      <br/>
-      positive {positivePercent} %
-    </div>
+    <>
+    <StatisticLine type='Average' value={average}/>
+    <StatisticLine type='Positive' value={positivePercent + ' %'}/>
+    </>
   )
 }
 
-const VoteAmounts = ({type, amount}) => (
+const StatisticLine = ({type, value}) => (
   <div>
-    {type} {amount}
+    {type} {value}
   </div>
 )
 
