@@ -97,6 +97,14 @@ const StatsAggregate = ({votes}) => {
   const average = positivityScore/totalVotes || 0;
   const positivePercent = (positiveVotes/totalVotes * 100) || 0;
 
+  if(totalVotes == 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  }
+
   return (
     <div>
       average {average}
