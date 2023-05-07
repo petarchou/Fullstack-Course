@@ -80,16 +80,43 @@ const Statistics = ({votes}) => {
       {
         votes.map(vote => {
           return (
-            <VoteStats key={vote.type} type={vote.type} amount={vote.amount}/>
+            <VoteAmounts key={vote.type} type={vote.type} amount={vote.amount}/>
           )
         })
       }
+      <StatsAggregate votes={votes}/>
     </div>
   )
 
 }
 
-const VoteStats = ({type, amount}) => (
+const StatsAggregate = ({votes}) => {
+  let totalVotes = 0, positivityScore = 0, positiveVotes = 0;
+  
+  votes.forEach(vote => {
+    if(vote.type.localeCompare('Good') === 0) {
+      positiveVotes+= vote.amount;
+      positivityScore += vote.amount;
+    }
+    else if(vote.type.localeCompare('Bad') === 0) {
+      positivityScore -= vote.amount;
+    }
+    totalVotes += vote.amount;
+  });
+
+  const average = positivityScore/totalVotes || 0;
+  const positivePercent = (positiveVotes/totalVotes * 100) || 0;
+
+  return (
+    <div>
+      average {average}
+      <br/>
+      positive {positivePercent} %
+    </div>
+  )
+}
+
+const VoteAmounts = ({type, amount}) => (
   <div>
     {type} {amount}
   </div>
