@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './components/Filter'
+import FormComponent from './components/FormComponent';
+import Contacts from './components/Contacts';
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -7,12 +10,13 @@ const App = () => {
     { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
     { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
   ]);
+
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
-
-
+  
+  //render persons
   const personsToShow = showAll
   ? persons
   : persons.filter(person => 
@@ -42,6 +46,7 @@ const App = () => {
     const contact = {
       name: newName,
       number: newNumber,
+      id: persons.length+1,
     }
     setPersons(persons.concat(contact));
   }
@@ -62,38 +67,22 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <div style={{margin: 10+"px"}}>
-        <input 
-        value={nameFilter}
-        onChange={handleFilterChange}
-        />
-      </div>
-      <form onSubmit={submitNewContact}>
-        <div>
-          name: <input
-            value={newName}
-            placeholder='add contact name...'
-            onChange={handleNameInputChange}
-          />
-        </div>
-        <div>
-          number: <input
-            value={newNumber}
-            placeholder='add contact number...'
-            onChange={handleNumberInputChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <h1>Phonebook</h1>
+
+      <Filter value={nameFilter} handleChange={handleFilterChange}/>
+      
+      <h2>Add new contact</h2>
+      <FormComponent submit={submitNewContact}
+      name={newName}
+      nameChange={handleNameInputChange}
+      number={newNumber}
+      numberChange={handleNumberInputChange}
+      />
+
       <h2>Contacts</h2>
-      {personsToShow.map(person => (
-        <div key={person.id}>
-          {person.name} - {person.number}
-        </div>
-      ))}
+      {/* Contacts component */}
+
+      <Contacts personsToShow={personsToShow}/>
     </div>
   )
 }
