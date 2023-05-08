@@ -17,14 +17,14 @@ const App = () => {
 
   useEffect(() => {
     contactsService.getAll()
-    .then(initialContacts => setContacts(initialContacts));
+      .then(initialContacts => setContacts(initialContacts));
   }, []);
-  
+
 
   const personsToShow = showAll
-  ? contacts
-  : contacts.filter(person => 
-    person.name.toLowerCase().includes(nameFilter.toLowerCase()));
+    ? contacts
+    : contacts.filter(person =>
+      person.name.toLowerCase().includes(nameFilter.toLowerCase()));
 
 
   const handleNameInputChange = (e) => {
@@ -38,30 +38,40 @@ const App = () => {
   const submitNewContact = (e) => {
     e.preventDefault();
 
-    if(
+    if (
       contacts.map(person => person.name.toLowerCase())
-      .includes(newName.toLowerCase())
+        .includes(newName.toLowerCase())
     ) {
       window.alert(
         `Contact with name ${newName} already exists`
       );
     }
     else {
-    const contact = {
-      name: newName,
-      number: newNumber,
+      const contact = {
+        name: newName,
+        number: newNumber,
+      }
+
+      contactsService.create(contact)
+        .then(createdContact => setContacts(contacts.concat(createdContact)));
     }
-    
-    contactsService.create(contact)
-    .then(createdContact => setContacts(contacts.concat(createdContact)));
-  }
     setNewName('');
     setNewNumber('');
   }
 
+  const handleDelete = (person) => {
+    const message = `Are you sure you want to delete ${person.name}?`
+    if (window.confirm(message)) {
+      contactsService.remove(person.id)
+        .then(() => {
+          setContacts(contacts.filter(c => c.id !== person.id));
+        })
+    }
+  }
+
 
   const handleFilterChange = (e) => {
-    if(e.target.value === '') {
+    if (e.target.value === '') {
       setShowAll(true);
     }
     else {
@@ -74,19 +84,19 @@ const App = () => {
     <div>
       <h1>Phonebook</h1>
 
-      <Filter value={nameFilter} handleChange={handleFilterChange}/>
-      
+      <Filter value={nameFilter} handleChange={handleFilterChange} />
+
       <h2>Add new contact</h2>
       <FormComponent submit={submitNewContact}
-      name={newName}
-      nameChange={handleNameInputChange}
-      number={newNumber}
-      numberChange={handleNumberInputChange}
+        name={newName}
+        nameChange={handleNameInputChange}
+        number={newNumber}
+        numberChange={handleNumberInputChange}
       />
 
       <h2>Contacts</h2>
 
-      <Contacts personsToShow={personsToShow}/>
+      <Contacts handleDelete={handleDelete} personsToShow={personsToShow} />
     </div>
   )
 }

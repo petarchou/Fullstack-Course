@@ -1,19 +1,23 @@
 import React from 'react'
+import contactsService from '../services/contactsService'
 
-const Contacts = ({ personsToShow }) => {
+const Contacts = ({ personsToShow, handleDelete }) => {
 
     return (
         <table>
             <tbody>
                 {personsToShow.map(person => (
-                    <ContactLine key={person.id} person={person}/>
-            ))}
+                    <ContactLine key={person.id}
+                        person={person}
+                        handleDelete={handleDelete} />
+                ))}
             </tbody>
         </table>
     )
 }
 
-const ContactLine = ({person}) => {
+const ContactLine = ({ person, handleDelete }) => {
+
 
     return (
         <tr>
@@ -22,6 +26,11 @@ const ContactLine = ({person}) => {
             </td>
             <td>
                 {person.number}
+            </td>
+            <td>
+                <button onClick={handleDelete.bind(null,person)}>
+                    delete
+                </button>
             </td>
         </tr>
     );
