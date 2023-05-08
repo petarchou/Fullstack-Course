@@ -35,23 +35,36 @@ const App = () => {
     setNewNumber(e.target.value);
   }
 
+  const updateContactNumber = () => {
+    contactsService.getByName(newName)
+          .then(contactEntity => {
+            contactEntity.number = newNumber;
+            return contactEntity;
+          })
+          .then(updatedContact => contactsService.update(
+            updatedContact.id, updatedContact
+          ))
+          .then(updatedContact => setContacts(
+            contacts.map(contact => contact.id !== updatedContact.id
+              ? contact
+              : updatedContact)
+          ));
+  }
+
   const submitNewContact = (e) => {
     e.preventDefault();
 
-    if (
-      contacts.map(person => person.name.toLowerCase())
-        .includes(newName.toLowerCase())
-    ) {
-      window.alert(
-        `Contact with name ${newName} already exists`
-      );
+    if (contacts.map(person => person.name).includes(newName)) {
+      const message = `${newName} already exists in the phonebook, replace the old number with a new one?`;
+      if (window.confirm(message)) {
+        updateContactNumber();
+      }
     }
     else {
       const contact = {
         name: newName,
         number: newNumber,
       }
-
       contactsService.create(contact)
         .then(createdContact => setContacts(contacts.concat(createdContact)));
     }
