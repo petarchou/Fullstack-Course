@@ -7,17 +7,27 @@ const App = () => {
   const [newName, setNewName] = useState('')
 
 
-  const handleNewName = (e) => {
+  const handleNameInputChange = (e) => {
     setNewName(e.target.value);
   }
 
   const submitNewContact = (e) => {
     e.preventDefault();
+
+    if(
+      persons.map(person => person.name.toLowerCase())
+      .includes(newName.toLowerCase())
+    ) {
+      window.alert(
+        `Contact with name ${newName} already exists`
+      );
+    }
+    else {
     const contact = {
       name: newName,
     }
-
     setPersons(persons.concat(contact));
+  }
     setNewName('');
   }
 
@@ -29,7 +39,7 @@ const App = () => {
           name: <input
             value={newName}
             placeholder='add new contact...'
-            onChange={handleNewName}
+            onChange={handleNameInputChange}
           />
         </div>
         <div>
