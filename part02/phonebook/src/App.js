@@ -4,6 +4,7 @@ import Filter from './components/Filter'
 import FormComponent from './components/FormComponent';
 import Contacts from './components/Contacts';
 import Notification from './components/Notification';
+import ErrorBox from './components/Error';
 
 import contactsService from './services/contactsService';
 
@@ -14,7 +15,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
-  const [notification, setNotification] = useState('THING HAPPENED!');
+  const [notification, setNotification] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     contactsService.getAll()
@@ -23,7 +25,7 @@ const App = () => {
 
   const changeNotification = (message) => {
     setNotification(message);
-    setTimeout(()=>setNotification(null),5000);
+    setTimeout(() => setNotification(null), 5000);
   }
 
 
@@ -42,22 +44,29 @@ const App = () => {
   }
 
   const updateContactNumber = () => {
-    contactsService.getByName(newName)
-          .then(contactEntity => {
-            contactEntity.number = newNumber;
-            return contactEntity;
-          })
-          .then(updatedContact => contactsService.update(
-            updatedContact.id, updatedContact
-          ))
-          .then(updatedContact => {
-            const message = `The number of '${newName}' was updated to ${newNumber}`;
-            changeNotification(message);
-            return setContacts(
-            contacts.map(contact => contact.id !== updatedContact.id
-              ? contact
-              : updatedContact)
-          )})
+    const contactState = contacts.find(contact => contact.name === newName);
+
+    const contact = {
+      ...contactState,
+      number: newNumber,
+    } 
+
+    contactsService.update(contact.id, contact)
+      .then(updatedContact => {
+        const message = `The number of '${newName}' was updated to ${newNumber}`;
+        changeNotification(message);
+        return setContacts(
+          contacts.map(contact => contact.id !== updatedContact.id
+            ? contact
+            : updatedContact)
+        )
+      })
+      .catch(err => {
+        const message = `${contact.name} was already deleted from server`;
+        setError(message);
+        setTimeout(()=> setError(null),5000);
+        setContacts(contacts.filter(c => c.id !== contact.id));
+      })
   }
 
   const submitNewContact = (e) => {
@@ -92,6 +101,13 @@ const App = () => {
         .then(() => {
           const notification = `Contact '${person.name}' was deleted`;
           changeNotification(notification);
+        })
+        .catch(err => {
+          const message = `${person.name} was already deleted from server`;
+          setError(message);
+          setTimeout(()=> setError(null),5000);
+        })
+        .finally(()=> {
           setContacts(contacts.filter(c => c.id !== person.id));
         })
     }
@@ -112,6 +128,7 @@ const App = () => {
     <div>
       <h1>Phonebook</h1>
       <Notification message={notification} />
+      <ErrorBox message={error} />
       <Filter value={nameFilter} handleChange={handleFilterChange} />
 
       <h2>Add new contact</h2>
