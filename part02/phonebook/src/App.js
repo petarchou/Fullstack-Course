@@ -16,7 +16,7 @@ const App = () => {
   const [showAll, setShowAll] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
   
-  //render persons
+
   const personsToShow = showAll
   ? persons
   : persons.filter(person => 
@@ -80,7 +80,6 @@ const App = () => {
       />
 
       <h2>Contacts</h2>
-      {/* Contacts component */}
 
       <Contacts personsToShow={personsToShow}/>
     </div>
