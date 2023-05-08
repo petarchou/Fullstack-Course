@@ -1,5 +1,4 @@
 import React from 'react'
-import contactsService from '../services/contactsService'
 
 const Contacts = ({ personsToShow, handleDelete }) => {
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
 import FormComponent from './components/FormComponent';
 import Contacts from './components/Contacts';
+import Notification from './components/Notification';
 
 import contactsService from './services/contactsService';
 
@@ -13,12 +14,17 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [nameFilter, setNameFilter] = useState('');
-
+  const [notification, setNotification] = useState('THING HAPPENED!');
 
   useEffect(() => {
     contactsService.getAll()
       .then(initialContacts => setContacts(initialContacts));
   }, []);
+
+  const changeNotification = (message) => {
+    setNotification(message);
+    setTimeout(()=>setNotification(null),5000);
+  }
 
 
   const personsToShow = showAll
@@ -44,11 +50,14 @@ const App = () => {
           .then(updatedContact => contactsService.update(
             updatedContact.id, updatedContact
           ))
-          .then(updatedContact => setContacts(
+          .then(updatedContact => {
+            const message = `The number of '${newName}' was updated to ${newNumber}`;
+            changeNotification(message);
+            return setContacts(
             contacts.map(contact => contact.id !== updatedContact.id
               ? contact
               : updatedContact)
-          ));
+          )})
   }
 
   const submitNewContact = (e) => {
@@ -66,7 +75,11 @@ const App = () => {
         number: newNumber,
       }
       contactsService.create(contact)
-        .then(createdContact => setContacts(contacts.concat(createdContact)));
+        .then(createdContact => setContacts(contacts.concat(createdContact)))
+        .then(() => {
+          const message = `Contact created: '${contact.name} - ${contact.number}'`;
+          changeNotification(message);
+        })
     }
     setNewName('');
     setNewNumber('');
@@ -77,6 +90,8 @@ const App = () => {
     if (window.confirm(message)) {
       contactsService.remove(person.id)
         .then(() => {
+          const notification = `Contact '${person.name}' was deleted`;
+          changeNotification(notification);
           setContacts(contacts.filter(c => c.id !== person.id));
         })
     }
@@ -96,7 +111,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-
+      <Notification message={notification} />
       <Filter value={nameFilter} handleChange={handleFilterChange} />
 
       <h2>Add new contact</h2>
