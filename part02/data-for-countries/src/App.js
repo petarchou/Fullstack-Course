@@ -37,13 +37,13 @@ const App = () => {
       </div>
 
       <CountriesInfo countries={countriesToShow} />
-      <ErrorBox message={errorMessage}/>
+      <ErrorBox message={errorMessage} />
     </div>
   );
 }
 
-const ErrorBox = ({message}) => {
-  if(message === null) {
+const ErrorBox = ({ message }) => {
+  if (message === null) {
     return null;
   }
 
@@ -72,10 +72,39 @@ const CountriesInfo = ({ countries }) => {
   return (
     <div>
       {countries.map(country => (
-        <div key={country.name.common}>
-          {country.name.common}
-        </div>
+        <GeneralInfo key={country.name.common}
+          country={country} />
       ))}
+    </div>
+  )
+}
+
+const GeneralInfo = ({ country }) => {
+
+  const [showDetails, setShowDetails] = useState('show');
+  const [countryDetails, setCountryDetails] = useState(null);
+  // const detailsContainer = document.querySelector('.details-container');
+
+  const toggleDetails = (e) => {
+    if(showDetails === 'show') {
+    setShowDetails('hide');
+    setCountryDetails(<DetailedInfo country={country}/>);
+    }
+    else {
+      setShowDetails('show');
+      setCountryDetails(null);
+    }
+  }
+
+  return (
+    <div>
+      {country.name.common} <input
+      type='submit'
+      value={showDetails}
+      onClick={toggleDetails} />
+      <div className='details-container'>
+        {countryDetails}
+      </div>
     </div>
   )
 }
@@ -86,7 +115,7 @@ const DetailedInfo = ({ country }) => {
       <h3>{country.name.common}</h3>
       <div>
         capital {country.capital}
-        <br/>
+        <br />
         area {country.area}
       </div>
       <div>
@@ -98,13 +127,13 @@ const DetailedInfo = ({ country }) => {
   )
 }
 
-const Flag = ({img}) => {
-  return(
-    <img src={img} alt='flag' width={150} height={150}/>
+const Flag = ({ img }) => {
+  return (
+    <img src={img} alt='flag' width={150} height={150} />
   )
 }
 
-const Languages = ({languages}) => {
+const Languages = ({ languages }) => {
   return (
     <ul>
       {Object.values(languages).map(language => (
