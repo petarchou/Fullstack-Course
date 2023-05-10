@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import countryService from './components/countryService';
+import weatherService from './components/weatherService';
 
 const App = () => {
   const [countryInput, setCountry] = useState('');
@@ -86,9 +87,9 @@ const GeneralInfo = ({ country }) => {
   // const detailsContainer = document.querySelector('.details-container');
 
   const toggleDetails = (e) => {
-    if(showDetails === 'show') {
-    setShowDetails('hide');
-    setCountryDetails(<DetailedInfo country={country}/>);
+    if (showDetails === 'show') {
+      setShowDetails('hide');
+      setCountryDetails(<DetailedInfo country={country} />);
     }
     else {
       setShowDetails('show');
@@ -99,9 +100,9 @@ const GeneralInfo = ({ country }) => {
   return (
     <div>
       {country.name.common} <input
-      type='submit'
-      value={showDetails}
-      onClick={toggleDetails} />
+        type='submit'
+        value={showDetails}
+        onClick={toggleDetails} />
       <div className='details-container'>
         {countryDetails}
       </div>
@@ -123,8 +124,38 @@ const DetailedInfo = ({ country }) => {
         <Languages languages={country.languages} />
       </div>
       <Flag img={country.flags.svg} />
+      <WeatherReport city={country.capital} />
     </div>
   )
+}
+
+const WeatherReport = ({ city }) => {
+  const [weather, setWeather] = useState(null);
+
+  const generateWeatherReport = async () => {
+    const weatherReport = await weatherService.getCityWeather(city);
+    console.log(weatherReport);
+    const { temp_c, wind_kph } = weatherReport.current;
+    const img = weatherReport.current.condition.icon;
+    setWeather({temp_c, wind_kph, img});
+  }
+  generateWeatherReport();
+  setInterval(generateWeatherReport, 3600*1000/2);
+
+  if(weather === null) {
+    return null;
+  }
+
+  return (
+    <div>
+      Weather in {city} <img src={weather.img} alt='weather'></img>
+      <br/>
+      Temperature: {weather.temp_c} C
+      <br/>
+      Wind: {weather.wind_kph} kph
+    </div>
+  );
+
 }
 
 const Flag = ({ img }) => {
