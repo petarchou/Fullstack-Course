@@ -134,12 +134,14 @@ const WeatherReport = ({ city }) => {
 
   const generateWeatherReport = async () => {
     const weatherReport = await weatherService.getCityWeather(city);
-    console.log(weatherReport);
+    console.log(1);
     const { temp_c, wind_kph } = weatherReport.current;
     const img = weatherReport.current.condition.icon;
     setWeather({temp_c, wind_kph, img});
   }
-  generateWeatherReport();
+  useEffect(()=>{
+    generateWeatherReport();
+  },[]);
   setInterval(generateWeatherReport, 3600*1000/2);
 
   if(weather === null) {

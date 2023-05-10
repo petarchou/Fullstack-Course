@@ -1,5 +1,5 @@
 const baseUrl = 'https://api.weatherapi.com/v1/current.json';
-const apiKey = '2661e8e2339544a1899221414231005';
+const apiKey = process.env.REACT_APP_API_KEY;
 
 const getCityWeather = (cityName) => {
     const url = `${baseUrl}?q=${cityName}&key=${apiKey}`;
