@@ -1,9 +1,10 @@
 import Note from './components/Note'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Notification from './components/Notification'
+import LoginForm from './components/LoginForm'
 
 import notesService from './services/notes'
+import loginService from './services/login'
 
 const App = () => {
 
@@ -11,16 +12,36 @@ const App = () => {
   const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
 
-    const hook = () => {
-      notesService.getAll()
-        .then(initialNotes => {
-          setNotes(initialNotes);
-        })
-    }
+  const hook = () => {
+    notesService.getAll()
+      .then(initialNotes => {
+        setNotes(initialNotes);
+      })
+  }
 
   useEffect(hook, []);
-  
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    console.log('logging with', username, password)
+    try {
+      const user = await loginService.login({ username, password })
+      setUser(user)
+      setUsername('')
+      setPassword('')
+      notesService.setToken(user.token)
+    } catch (exception) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
 
 
   const notesToShow = showAll
@@ -35,11 +56,11 @@ const App = () => {
       important: false,
     }
 
-    notesService.create(noteObject)
-    .then(responseNote => {
-      setNotes(notes.concat(responseNote));
-      setNewNote('');
-    })
+    notesService.create(noteObject, user.token)
+      .then(responseNote => {
+        setNotes(notes.concat(responseNote));
+        setNewNote('');
+      })
   }
 
   const handleNoteChange = (e) => {
@@ -47,31 +68,55 @@ const App = () => {
   }
 
   const toggleImportanceOf = (id) => {
-    const note = notes.find(n=> n.id === id);
+    const note = notes.find(n => n.id === id);
     const changedNote = {
       ...note,
       important: !note.important,
     }
 
     notesService.update(id, changedNote)
-    .then(responseNote => {
-      setNotes(notes.map(note => note.id !== id ? note : responseNote));
-    })
-    .catch(err => {
-      setErrorMessage(
-        `Note '${note.content}' has been removed from server`
-      )
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
-      setNotes(notes.filter(n => n.id !== note.id));
-    })
+      .then(responseNote => {
+        setNotes(notes.map(note => note.id !== id ? note : responseNote));
+      })
+      .catch(err => {
+        setErrorMessage(
+          `Note '${note.content}' has been removed from server`
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setNotes(notes.filter(n => n.id !== note.id));
+      })
   }
+
+
+
+  const noteForm = () => (
+    <form onSubmit={addNote}>
+      <input value={newNote}
+        onChange={handleNoteChange}
+        placeholder='add a new note...' />
+      <button type="submit">save</button>
+    </form>
+  )
 
   return (
     <div>
       <h1>Notes</h1>
       <Notification message={errorMessage} />
+
+      {!user && <LoginForm handleLogin={handleLogin}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}></LoginForm>}
+      {user &&
+        <div>
+          <p>{user.name} logged in</p>
+          {noteForm()}
+        </div>
+      }
+
       <div>
         <button onClick={() => setShowAll(!showAll)}>
           show {showAll ? 'important' : 'all'}
@@ -79,18 +124,13 @@ const App = () => {
       </div>
       <ul>
         {notesToShow.map(note =>
-          <Note 
-          key={note.id}
-          note={note}
-          toggleImportance={toggleImportanceOf.bind(null,note.id)} />
+          <Note
+            key={note.id}
+            note={note}
+            toggleImportance={toggleImportanceOf.bind(null, note.id)} />
         )}
       </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote}
-          onChange={handleNoteChange}
-          placeholder='add a new note...' />
-        <button type="submit">save</button>
-      </form>
+
       <Footer />
     </div>
   )
