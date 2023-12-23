@@ -16,14 +16,24 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const hook = () => {
+  const initialNotesHook = () => {
     notesService.getAll()
       .then(initialNotes => {
         setNotes(initialNotes);
       })
   }
 
-  useEffect(hook, []);
+  const loggedHook = () => {
+    const userJson = window.localStorage.getItem('loggedUser')
+    if (userJson) {
+      const user = JSON.parse(userJson)
+      setUser(user)
+      notesService.setToken(user.token)
+    }
+  }
+
+  useEffect(initialNotesHook, []);
+  useEffect(loggedHook, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -33,6 +43,10 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      window.localStorage.setItem(
+        'loggedUser',
+        JSON.stringify(user)
+      )
       notesService.setToken(user.token)
     } catch (exception) {
       setErrorMessage('Wrong credentials')
@@ -40,6 +54,13 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
+  }
+
+  const logout = (e) => {
+    e.preventDefault()
+    window.localStorage.removeItem('loggedUser')
+    notesService.setToken(null)
+    window.location.reload()
   }
 
 
@@ -113,6 +134,7 @@ const App = () => {
       {user &&
         <div>
           <p>{user.name} logged in</p>
+          <button onClick={logout}>logout</button>
           {noteForm()}
         </div>
       }
