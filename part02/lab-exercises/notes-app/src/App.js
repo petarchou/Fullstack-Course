@@ -128,10 +128,10 @@ const App = () => {
     return (
       <Togglable buttonLabel='login'>
         <LoginForm handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}></LoginForm>
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}></LoginForm>
       </Togglable>
     )
   }
