@@ -2,6 +2,7 @@ import Note from './components/Note'
 import { useState, useEffect } from 'react'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 
 import notesService from './services/notes'
 import loginService from './services/login'
@@ -41,8 +42,6 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password })
       setUser(user)
-      setUsername('')
-      setPassword('')
       window.localStorage.setItem(
         'loggedUser',
         JSON.stringify(user)
@@ -53,6 +52,9 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
+    } finally {
+      setUsername('')
+      setPassword('')
     }
   }
 
@@ -121,16 +123,25 @@ const App = () => {
     </form>
   )
 
+  const loginForm = () => {
+
+    return (
+      <Togglable buttonLabel='login'>
+        <LoginForm handleLogin={handleLogin}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}></LoginForm>
+      </Togglable>
+    )
+  }
+
   return (
     <div>
       <h1>Notes</h1>
       <Notification message={errorMessage} />
 
-      {!user && <LoginForm handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}></LoginForm>}
+      {!user && loginForm()}
       {user &&
         <div>
           <p>{user.name} logged in</p>
