@@ -24,7 +24,7 @@ return (
     <form onSubmit={addNote}>
       <input value={newNote}
         onChange={handleNoteChange}
-        placeholder='add a new note...' />
+        placeholder='write note content here' />
       <button type="submit">save</button>
     </form>
 )
