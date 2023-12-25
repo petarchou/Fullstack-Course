@@ -1,5 +1,5 @@
 import Note from './components/Note'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
@@ -16,6 +16,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
+  const noteFormRef = useRef()
 
   const initialNotesHook = () => {
     notesService.getAll()
@@ -73,6 +75,7 @@ const App = () => {
 
 
     const createNote = async (noteObject) => {
+      noteFormRef.current.toggleVisibility()
       const createdNote = await notesService.create(noteObject, user.token)
       setNotes(notes.concat(createdNote));
     }
@@ -112,6 +115,12 @@ const App = () => {
     )
   }
 
+  const noteForm = () => (
+    <Togglable buttonLabel='new note' ref={noteFormRef}>
+      <NoteForm createNote={createNote} />
+    </Togglable>
+  )
+
   return (
     <div>
       <h1>Notes</h1>
@@ -122,9 +131,7 @@ const App = () => {
         <div>
           <p>{user.name} logged in</p>
           <button onClick={logout}>logout</button>
-          <Togglable buttonLabel='new note'>
-          <NoteForm createNote={createNote}/>
-          </Togglable>
+          {noteForm()}
         </div>
       }
 
