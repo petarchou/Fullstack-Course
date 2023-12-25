@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
+import NoteForm from './components/NoteForm'
 
 import notesService from './services/notes'
 import loginService from './services/login'
@@ -10,7 +11,6 @@ import loginService from './services/login'
 const App = () => {
 
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('');
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState('')
@@ -72,23 +72,10 @@ const App = () => {
     : notes.filter(note => note.important);
 
 
-  const addNote = (e) => {
-    e.preventDefault();
-    const noteObject = {
-      content: newNote,
-      important: false,
+    const createNote = async (noteObject) => {
+      const createdNote = await notesService.create(noteObject, user.token)
+      setNotes(notes.concat(createdNote));
     }
-
-    notesService.create(noteObject, user.token)
-      .then(responseNote => {
-        setNotes(notes.concat(responseNote));
-        setNewNote('');
-      })
-  }
-
-  const handleNoteChange = (e) => {
-    setNewNote(e.target.value);
-  }
 
   const toggleImportanceOf = (id) => {
     const note = notes.find(n => n.id === id);
@@ -111,17 +98,6 @@ const App = () => {
         setNotes(notes.filter(n => n.id !== note.id));
       })
   }
-
-
-
-  const noteForm = () => (
-    <form onSubmit={addNote}>
-      <input value={newNote}
-        onChange={handleNoteChange}
-        placeholder='add a new note...' />
-      <button type="submit">save</button>
-    </form>
-  )
 
   const loginForm = () => {
 
@@ -146,7 +122,9 @@ const App = () => {
         <div>
           <p>{user.name} logged in</p>
           <button onClick={logout}>logout</button>
-          {noteForm()}
+          <Togglable buttonLabel='new note'>
+          <NoteForm createNote={createNote}/>
+          </Togglable>
         </div>
       }
 
